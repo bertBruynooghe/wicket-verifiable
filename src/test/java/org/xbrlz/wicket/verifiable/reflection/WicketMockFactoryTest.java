@@ -1,67 +1,70 @@
 package org.xbrlz.wicket.verifiable.reflection;
 
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.lang.PropertyResolver;
+import org.apache.wicket.util.lang.PropertyResolverConverter;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.*;
+import static org.apache.wicket.util.lang.PropertyResolver.*;
 import static org.xbrlz.wicket.verifiable.reflection.WicketMockFactory.*;
 
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration("org.xbrlz.wicket.verifiable.testApplicationContext.xml")
 public class WicketMockFactoryTest {
-//    @Autowired
-//    WebApplication application;
+
+    private PropertyResolverConverter converter;
+
+    @Before
+    public void setUp() throws Exception {
+        converter = Mockito.mock(PropertyResolverConverter.class);
+    }
 
     @Test
     public void testInstantiation() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(Object.class), "");
-        assertMockType(model.getObject(), Object.class);
+        Object mock = mock(Object.class);
+        assertMockType(getValue("", mock), Object.class);
     }
 
     @Test
     public void testDuplicateInstantiation() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(Object.class), "");
-        model = new PropertyModel<Object>(mock(Object.class), "");
-        assertMockType(model.getObject(), Object.class);
+        Object mock = mock(Object.class);
+        mock = mock(Object.class);
+        assertMockType(getValue("", mock), Object.class);
     }
 
     @Test
     public void testHasGetter() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(GetterContainer.class), "test");
-        assertMockType(model.getObject(), FieldContainer.class);
+        Object mock = mock(GetterContainer.class);
+        assertMockType(getValue("test", mock), FieldContainer.class);
     }
 
     @Test
     public void testHasField() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(FieldContainer.class), "integer");
-        assertMockType(model.getObject(), Integer.class);
+        Object mock = mock(FieldContainer.class);
+        assertMockType(getValue("integer", mock), Integer.class);
     }
 
     @Test
     public void testNested() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(GetterContainer.class), "test.integer");
-        assertMockType(model.getObject(), Integer.class);
+        Object mock = mock(GetterContainer.class);
+        assertMockType(getValue("test.integer", mock), Integer.class);
     }
 
     @Test
     public void testInterface() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(GetterContainerInterface.class), "test.integer");
-        assertMockType(model.getObject(), Integer.class);
+        Object mock = mock(GetterContainerInterface.class);
+        assertMockType(getValue("test.integer", mock), Integer.class);
     }
 
     @Test
     public void testArrayFieldContainerItem() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(ArrayContainer.class), "array.0.test");
-        assertMockType(model.getObject(), FieldContainer.class);
+        Object mock = mock(ArrayContainer.class);
+        assertMockType(getValue("array.0.test", mock), FieldContainer.class);
     }
 
 
@@ -72,28 +75,28 @@ public class WicketMockFactoryTest {
 
     @Test
     public void testListItem() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(List.class), "0.toString()");
-        assertMockType(model.getObject(), String.class);
+        Object mock = mock(List.class);
+        String expression = "0.toString()";
+        assertMockType(getValue(expression, mock), String.class);
     }
 
-//    @Test(expected = Test.None.class)
-//    public void testSetter() throws Exception {
-//        new WicketTester(application);
-//        IModel model = new PropertyModel<Object>(mock(Date.class), "seconds");
-//        model.setObject(5);
-//    }
+    @Test(expected = Test.None.class)
+    public void testSetterOnWritableProperty() throws Exception {
+        Object mock = mock(Date.class);
+        PropertyResolver.setValue("seconds", mock, null, converter);
+    }
 
     @Test
     public void testArrayType() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(int[].class), "");
-        assertMockType(model.getObject(), int[].class);
+        Object mock = mock(int[].class);
+        assertMockType(getValue("", mock), int[].class);
     }
 
     @Test
     @Ignore("we will implement this later")
     public void testListItemChild() throws Exception {
-        IModel model = new PropertyModel<Object>(mock(TypedList.class), "0.test");
-        assertNotNull(model.getObject());
+        Object mock = mock(TypedList.class);
+        assertNotNull(getValue("0.test", mock));
     }
 
     public static interface GetterContainerInterface {
