@@ -1,43 +1,33 @@
 package org.xbrlz.wicket.verifiable;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.Session;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.util.convert.ConverterLocator;
+import org.apache.wicket.util.tester.WicketTester;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.Locale;
 
 import static junit.framework.Assert.*;
-import static org.mockito.Mockito.*;
 import static org.xbrlz.wicket.verifiable.VerifiablePropertyModel.*;
 
 public class VerifiablePropertyModelTest {
 
-    private WebApplication webApplication;
-    private Session session;
-    private ConverterLocator converterLocator;
 
     @Before
     public void setUp() throws Exception {
-        converterLocator = mock(ConverterLocator.class);
-        webApplication = mock(WebApplication.class);
-        when(webApplication.getConfigurationType()).thenReturn(Application.DEVELOPMENT);
-        WebApplication.set(webApplication);
+        new WicketTester();
+    }
 
-        session = mock(Session.class);
-        when(session.getLocale()).thenReturn(Locale.US);
-        Session.set(session);
-
+    @After
+    public void tearDown() throws Exception {
+        System.setProperty("wicket." + Application.CONFIGURATION, Application.DEVELOPMENT);
     }
 
     /**
-     * TODO: VerifiablePropertyModel should not use ExpressionValidator.
-     * get rid of junit dependency only do validation in development mode
+     * TODO: get rid of junit dependency only do validation in development mode
      * ...
      */
 
@@ -49,13 +39,13 @@ public class VerifiablePropertyModelTest {
 
     @Test(expected = WicketRuntimeException.class)
     public void testValidateInDevelopmentMode() throws Exception {
-        when(webApplication.getConfigurationType()).thenReturn(Application.DEVELOPMENT);
+        System.setProperty("wicket." + Application.CONFIGURATION, Application.DEVELOPMENT);
         newPropertyModel(new Object(), Object.class).withExpression("test", Object.class);
     }
 
     @Test(expected = Test.None.class)
     public void testDoesNotValidateInDeploymentMode() throws Exception {
-        when(webApplication.getConfigurationType()).thenReturn(Application.DEPLOYMENT);
+        System.setProperty("wicket." + Application.CONFIGURATION, Application.DEPLOYMENT);
         newPropertyModel(new Object(), Object.class).withExpression("test", Object.class);
     }
 
