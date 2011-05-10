@@ -1,15 +1,16 @@
 package org.xbrlz.wicket.verifiable;
 
 import org.apache.wicket.Application;
+import org.apache.wicket.Session;
 import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.util.convert.ConverterLocator;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import java.util.Date;
+import java.util.Locale;
 
 import static junit.framework.Assert.*;
 import static org.mockito.Mockito.*;
@@ -18,12 +19,19 @@ import static org.xbrlz.wicket.verifiable.VerifiablePropertyModel.*;
 public class VerifiablePropertyModelTest {
 
     private WebApplication webApplication;
+    private Session session;
+    private ConverterLocator converterLocator;
 
     @Before
     public void setUp() throws Exception {
-        webApplication = Mockito.mock(WebApplication.class);
+        converterLocator = mock(ConverterLocator.class);
+        webApplication = mock(WebApplication.class);
         when(webApplication.getConfigurationType()).thenReturn(Application.DEVELOPMENT);
         WebApplication.set(webApplication);
+
+        session = mock(Session.class);
+        when(session.getLocale()).thenReturn(Locale.US);
+        Session.set(session);
 
     }
 
@@ -33,7 +41,6 @@ public class VerifiablePropertyModelTest {
      * ...
      */
 
-    @Ignore
     @Test
     public void testDefaultPropertyModel() throws Exception {
         IModel<String> model = newPropertyModel("test", String.class);
@@ -52,7 +59,6 @@ public class VerifiablePropertyModelTest {
         newPropertyModel(new Object(), Object.class).withExpression("test", Object.class);
     }
 
-    @Ignore
     @Test
     public void testNestedPropertyModel() throws Exception {
         IModel<String> model = newPropertyModel(5, Integer.class)
@@ -60,7 +66,6 @@ public class VerifiablePropertyModelTest {
         assertEquals("5", model.getObject());
     }
 
-    @Ignore
     @Test(expected = UnsupportedOperationException.class)
     public void testNonWritablePropertyModel() throws Exception {
         IModel<String> model = newPropertyModel(5, Integer.class)
@@ -68,7 +73,6 @@ public class VerifiablePropertyModelTest {
         model.setObject("4");
     }
 
-    @Ignore
     @Test
     public void testWritablePropertyModel() throws Exception {
         IModel<Integer> model = newPropertyModel(new Date(0), Date.class)
@@ -78,7 +82,6 @@ public class VerifiablePropertyModelTest {
         assertEquals(new Integer(5), model.getObject());
     }
 
-    @Ignore
     @Test
     public void testArrayPropertyModel() throws Exception {
         int[] expectedValue = new int[10];
@@ -86,7 +89,6 @@ public class VerifiablePropertyModelTest {
         assertEquals(expectedValue, model.getObject());
     }
 
-    @Ignore
     @Test
     public void testArrayItemPropertyModel() throws Exception {
         int[] expectedValue = new int[10];
