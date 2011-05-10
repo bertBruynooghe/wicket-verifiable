@@ -9,8 +9,6 @@ import javassist.NotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-
 
 public class WicketMockFactory {
     /**
@@ -59,7 +57,6 @@ public class WicketMockFactory {
         return mock;
     }
 
-    //TODO: rename?
     public static void assertMockType(Object mock, Class clazz) {
         try {
             CtClass referenceClass = ClassPool.getDefault().get(clazz.getName());
@@ -76,6 +73,16 @@ public class WicketMockFactory {
             throw new RuntimeException(e);
         }
     }
+
+    private static void assertEquals(String value1, String value2) {
+        assertEquals(value1, value2);
+    }
+
+    private static void assertEquals(String msg, String value1, String value2) {
+        if (!value1.equals(value2))
+            throw new AssertionError(msg);
+    }
+
 
     public static interface WicketMock {
         CtClass getClassToMock();

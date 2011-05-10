@@ -26,11 +26,6 @@ public class VerifiablePropertyModelTest {
         System.setProperty("wicket." + Application.CONFIGURATION, Application.DEVELOPMENT);
     }
 
-    /**
-     * TODO: get rid of junit dependency only do validation in development mode
-     * ...
-     */
-
     @Test
     public void testDefaultPropertyModel() throws Exception {
         IModel<String> model = newPropertyModel("test", String.class);
